@@ -41,24 +41,26 @@ while True:
     datas =''.join(map(lambda x:('/x' if len(hex(x))>=4 else '/x0')+hex(x)[2:],n))
     
     new_datas = datas.split("/x")
-    
-    for i in range(1,15):
-        if new_datas[i] == "02" and new_datas[i+1] == "28":
-            if i <= 10:
-                need = new_datas[i+4]+new_datas[i+5]+new_datas[i+2]+new_datas[i+3]
-            elif i == 11:
-                need = new_datas[15]+new_datas[1]+new_datas[13]+new_datas[14]
-            elif i == 12:
-                need = new_datas[1]+new_datas[2]+new_datas[14]+new_datas[15]
-            elif i == 13:
-                need = new_datas[2]+new_datas[3]+new_datas[15]+new_datas[1]
-            elif i == 14:
-                need = new_datas[3]+new_datas[4]+new_datas[1]+new_datas[2]               
+    try:
+        for i in range(1,15):
+            if new_datas[i] == "02" and new_datas[i+1] == "28":
+                if i <= 10:
+                    need = new_datas[i+4]+new_datas[i+5]+new_datas[i+2]+new_datas[i+3]
+                elif i == 11:
+                    need = new_datas[15]+new_datas[1]+new_datas[13]+new_datas[14]
+                elif i == 12:
+                    need = new_datas[1]+new_datas[2]+new_datas[14]+new_datas[15]
+                elif i == 13:
+                    need = new_datas[2]+new_datas[3]+new_datas[15]+new_datas[1]
+                elif i == 14:
+                    need = new_datas[3]+new_datas[4]+new_datas[1]+new_datas[2] 
+    except IndexError:
+        need = new_datas[4]+new_datas[5]+new_datas[2]+new_datas[3]
     
     my_need = int(hex(int(need,16)),16)
     positionSI = 2*3.1416*my_need/4/6400/1
        
-    print(local_time,datas,positionSI) 
+    print(local_time,datas,my_need,positionSI) 
    
     if log > 20:
         s.close()
