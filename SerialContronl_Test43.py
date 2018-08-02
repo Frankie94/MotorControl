@@ -5,7 +5,7 @@ Created on Wed Aug  1 15:40:58 2018
 @author: Fangkai\
 
 @contact: kai.fang@siat.ac.cn
-000000
+
 """
 
 import serial 
