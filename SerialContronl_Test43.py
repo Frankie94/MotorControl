@@ -10,10 +10,21 @@ Created on Wed Aug  1 15:40:58 2018
 
 import serial 
 import time 
+import pymysql
 
 log = 0
 
 s = serial.Serial('com4', 115200, timeout=2)
+
+db = pymysql.connect("localhost", "root", "10086", "test")
+cursor = db.cursor()
+cursor.execute("DROP TABLE IF EXISTS Monitor_Data")
+creatTab = """CREATE TABLE Monitor_Data(
+    LOG_ID INT NOT NULL,
+    TIME CHAR(50),
+    POS_UI INT ,
+    POS_SI FLOAT )"""
+cursor.execute(creatTab)
 
 MotionCommand= bytes([0X08,0X0F,0XF0,0X24,0XA2,0X41,0X89,0X00,0X00,0X97,
                 0X08,0X0F,0XF0,0X24,0XA0,0X55,0X53,0X00,0X55,0XC8, 
@@ -41,7 +52,7 @@ while True:
     datas =''.join(map(lambda x:('/x' if len(hex(x))>=4 else '/x0')+hex(x)[2:],n))
     
     new_datas = datas.split("/x")
-    
+    hexPos = new_datas[3]+new_datas[4]+new_datas[1]+new_datas[2] 
     try:
         for i in range(1,15):
             if new_datas[i] == "02" and new_datas[i+1] == "28":
@@ -63,10 +74,19 @@ while True:
     positionSI = 2*3.1416*posUI/4/6400/1
     posSI = round(positionSI,2)   
     
-    print(local_time,hexPos,posSI) 
-   
+    print(local_time,hexPos,posSI)
+    
+    
+    sql = "INSERT INTO Monitor_Data(LOG_ID,TIME,POS_UI,POS_SI)VALUES('%d','%s','%d','%f')"%(log, local_time, posUI, posSI)
+    cursor.execute(sql)
+    db.commit()
+    
+    
     if log > 200:
         s.close()
         break
     
     time.sleep(0.01)
+    
+cursor.close() 
+db.close()
